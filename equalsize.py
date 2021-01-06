@@ -238,7 +238,7 @@ def genA(X, k, alpha = None, beta = None, divisor = None):
     if beta == None:
         beta = 1.0
     F = genF(N, k)          # column penalty matrix
-    return np.kron(np.identity(k), D + alpha * F) + rowpenalty(N, k)
+    return np.kron(np.identity(k), D + alpha * F) + beta * rowpenalty(N, k)
 
 def genF(N, k):
     ''' Generate F matrix
@@ -306,6 +306,3 @@ def rowpenalty(N, k):
         rowpenalty: numpy array
     '''
     return np.kron(np.ones(k) - 2 * np.identity(k), np.identity(N))
-
-if __name__ == "__main__":
-    test_exact()

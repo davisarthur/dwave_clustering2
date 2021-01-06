@@ -86,7 +86,7 @@ def gen_iris(N, k):
                 count += 1
     return X, target
 
-def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, divisor = None, data = "synth"):
+def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, beta = None, divisor = None, data = "synth"):
     # data file
     f = open(filename, "a")
     f.write(str(datetime.now()))    # denote date and time that test begins
@@ -102,6 +102,7 @@ def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, divisor = No
     f.write("\nTarget: " + str(target))
     f.write("\n(N, k): " + "(" + str(N) + ", " + str(k) + ")")
     f.write("\nAlpha: " + str(alpha))
+    f.write("\nBeta: " + str(beta))
     f.write("\nDivisor: " + str(divisor))
     f.write("\nData: \n" + str(X))
 
@@ -116,7 +117,7 @@ def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, divisor = No
     f.write("\nSKlearn algorithm objective value: " + str(equalsize.objective_value(X, sklearn_solution, k)))
 
     # generate QUBO model
-    model = equalsize.genModel(X, k, alpha = alpha, divisor = divisor)
+    model = equalsize.genModel(X, k, alpha = alpha, beta = beta, divisor = divisor)
 
     # find sampler
     sampler = equalsize.set_sampler()  # sets the D-Wave sampler
@@ -161,8 +162,9 @@ def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, divisor = No
     f.close()
 
 if __name__ == "__main__":
-    divisors = [1.0, 0.9]
-    alphas = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+    divisors = 0.9
+    alphas = [0.03125, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
+    betas = [0.03125, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
     synth_configs = [(16, 2), (24, 2), (32, 2), (12, 3), (15, 3), (21, 3), (8, 4), (12, 4), (16, 4)]
     iris_configs = [(8, 2), (16, 2), (24, 2), (32, 2), (9, 3), (12, 3), (15, 3), (18, 3), (21, 3)]
     d = 2
