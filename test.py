@@ -171,14 +171,12 @@ if __name__ == "__main__":
     for beta in betas:
         for alpha in alphas:
             for config in synth_configs:
-                for _ in range(20):
-                    N = config[0]
-                    k = config[1]
-                    test(config[0], config[1], d = d, filename = "revision_data.txt", \
-                        alpha = alpha, divisor = divisor, data = "synth")
+                N = config[0]
+                k = config[1]
+                test(N, k, d = d, filename = "revision_data_4.txt", \
+                    alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
             for config in iris_configs:
-                for _ in range(20):
-                    N = config[0]
-                    k = config[1]
-                    test(config[0], config[1], d = d, filename = "revision_data.txt", \
-                        alpha = alpha, divisor = divisor, data = "iris")
+                N = config[0]
+                k = config[1]
+                test(N, k, d = d, filename = "revision_data_4.txt", \
+                    alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "iris")
