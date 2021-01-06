@@ -149,15 +149,14 @@ def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, beta = None,
     centroids_naive, assignments_naive, num_viol_naive = \
         equalsize.postprocess_naive(X, solution)
     f.write("\nNaive assignments: " + str(assignments_naive))
-    f.write("\nNaive number of violations: " + str(num_viol_naive))
     f.write("\nNaive objective value: " + str(equalsize.objective_value(X, assignments_naive, k)))
 
     # updated postprocessing
     centroids_soph, assignments_soph, num_viol_soph = \
         equalsize.postprocess_soph(X, solution)
     f.write("\nSophisticated assignments: " + str(assignments_soph))
-    f.write("\nSophisticated number of violations: " + str(num_viol_soph))
     f.write("\nSophisticated objective value: " + str(equalsize.objective_value(X, assignments_soph, k)))
+    f.write("\nNumber of violations: " + str(num_viol_soph))
     f.write("\n\n")
     f.close()
 
