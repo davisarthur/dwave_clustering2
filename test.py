@@ -167,15 +167,16 @@ if __name__ == "__main__":
     synth_configs = [(8, 2), (16, 2), (24, 2), (32, 2), (12, 3), (15, 3), (18, 3), (21, 3), (8, 4), (12, 4), (16, 4)]
     iris_configs = [(8, 2), (16, 2), (24, 2), (32, 2), (9, 3), (12, 3), (15, 3), (18, 3), (21, 3)]
     d = 2
+    
     for beta in betas:
         for alpha in alphas:
             for config in synth_configs:
                 N = config[0]
                 k = config[1]
-                test(N, k, d = d, filename = "revision_data_4.txt", \
+                test(N, k, d = d, filename = "revision_data_5.txt", \
                     alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
             for config in iris_configs:
                 N = config[0]
                 k = config[1]
-                test(N, k, d = d, filename = "revision_data_4.txt", \
+                test(N, k, d = d, filename = "revision_data_5.txt", \
                     alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "iris")
