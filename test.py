@@ -163,24 +163,41 @@ def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, beta = None,
 if __name__ == "__main__":
     divisor = 0.9
     alphas = [0.03125, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
-    # betas = [0.03125, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
-    betas = [2.0, 4.0, 8.0]
+    #betas = [0.03125, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
+    betas = [4.0, 8.0]
     synth_configs = [(8, 2), (16, 2), (24, 2), (32, 2), (12, 3), (15, 3), (18, 3), (21, 3), (8, 4), (12, 4), (16, 4)]
     iris_configs = [(8, 2), (16, 2), (24, 2), (32, 2), (9, 3), (12, 3), (15, 3), (18, 3), (21, 3)]
     d = 2
     
-    spare_alphas = [0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
+    spare_synth_configs = [(32, 2), (12, 3), (15, 3), (18, 3), (21, 3), (8, 4), (12, 4), (16, 4)]
+    for config in spare_synth_configs:
+        alpha = 1.0
+        beta = 2.0
+        N = config[0]
+        k = config[1]
+        test(N, k, d = d, filename = "revision_data_5.txt", \
+            alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
+
+    for config in iris_configs:
+        alpha = 1.0
+        beta = 2.0
+        N = config[0]
+        k = config[1]
+        test(N, k, d = d, filename = "revision_data_5.txt", \
+            alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "iris")
+
+    spare_alphas = [2.0, 4.0, 8.0]
     for alpha in spare_alphas:
-        beta = 1.0
+        beta = 2.0
         for config in synth_configs:
-                N = config[0]
-                k = config[1]
-                test(N, k, d = d, filename = "revision_data_4.txt", \
-                    alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
+            N = config[0]
+            k = config[1]
+            test(N, k, d = d, filename = "revision_data_5.txt", \
+                alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
         for config in iris_configs:
             N = config[0]
             k = config[1]
-            test(N, k, d = d, filename = "revision_data_4.txt", \
+            test(N, k, d = d, filename = "revision_data_5.txt", \
                 alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "iris")
 
     for beta in betas:
@@ -188,10 +205,10 @@ if __name__ == "__main__":
             for config in synth_configs:
                 N = config[0]
                 k = config[1]
-                test(N, k, d = d, filename = "revision_data_4.txt", \
+                test(N, k, d = d, filename = "revision_data_5.txt", \
                     alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
             for config in iris_configs:
                 N = config[0]
                 k = config[1]
-                test(N, k, d = d, filename = "revision_data_4.txt", \
+                test(N, k, d = d, filename = "revision_data_5.txt", \
                     alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "iris")
