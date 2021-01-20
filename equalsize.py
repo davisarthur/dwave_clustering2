@@ -144,7 +144,8 @@ def postprocess_soph(X, solution):
         else:
             num_violations += 1
     for i in range(k):
-        M[i] /= cluster_sizes[i]
+        if cluster_sizes[i] > 0:
+            M[i] /= cluster_sizes[i]
     for i in range(N):
         if assignments[i] == -1:
             min = np.linalg.norm(M[0] - X[i])

@@ -326,6 +326,7 @@ def alphabeta(problems, max_alpha, max_beta, low = 0.005, num_trials = 3, resolu
             specfile.write("X: \n" + str(X) + "\n")
             specfile.write("Target: " + str(target))
             data[problem].append((X, target))
+    specfile.close()
 
     for key in data.keys():
         N = key[0]
@@ -338,8 +339,8 @@ def alphabeta(problems, max_alpha, max_beta, low = 0.005, num_trials = 3, resolu
                     test2(X, target, N, k, filename = f2, alpha = alpha * N / k, beta = beta * N / k, divisor = divisor)
 
 if __name__ == "__main__":
-    problems = [(16, 2), (24, 2), (32, 2)]
-    max_alpha = 1.0
-    max_beta = 0.25
+    problems = [(15, 3)]
+    max_alpha = 0.5
+    max_beta = 0.5
     alphabeta(problems, max_alpha, max_beta)
 
