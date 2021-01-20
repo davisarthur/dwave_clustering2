@@ -23,26 +23,21 @@ def psuedosolution(N, k, target, viol_size, viol_rate):
                         break
     return psuedo
 
+'''
+    distribution is an array of length k where each element is equal to the probability of a
+    point being assigned to that many clusters or less
+'''
 def psuedosolution2(N, k, target, distribution):
     psuedo = np.zeros(N * k).as_type(int)
     for i in range(N):
-        assigned = True if random.random() > viol_rate else False
-        if assigned:
-            psuedo[i + N * target[i]] = 1
-            continue
-
-        rand = int(np.round(np.random.normal(loc = 1, scale = viol_size)))
-        if rand >= k:
-            for j in range(k):
-                psuedo[i + N * j] = 1
-        if rand > 0:
-            psuedo[i + N * target[i]] = 1
-            for n in range(rand - 1):
-                while True:
-                    index = i + N * ((target[i] + random.randint(1, k - 1)) % k)
-                    if psuedo[i + N * index] == 0:
-                        psuedo[i + N * index] == 1
-                        break
+        result = random.random()
+        num_assigned = -1
+        for i in range(len(distribution))):
+            if result < distribution[i]:
+                num_assigned = i
+                break
+        possible_assignments = list(range(1, k + 1))
+        
     return psuedo
 
 N = 9
