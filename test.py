@@ -109,12 +109,10 @@ def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, beta = None,
     # solve classically
     balanced_solution = balanced.balanced_kmeans(X, k)[1]
     f.write("\nBalanced solution: " + str(balanced_solution))
-    f.write("\nBalanced objective value: " + str(equalsize.objective_value(X, balanced_solution, k)))
 
     kmeans = KMeans(n_clusters=k).fit(X)
     sklearn_solution = kmeans.labels_
     f.write("\nSKlearn algorithm solution: " + str(sklearn_solution))
-    f.write("\nSKlearn algorithm objective value: " + str(equalsize.objective_value(X, sklearn_solution, k)))
 
     # generate QUBO model
     model = equalsize.genModel(X, k, alpha = alpha, beta = beta, divisor = divisor)
@@ -145,22 +143,70 @@ def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, beta = None,
     f.write("\nD-Wave postprocessing time: " + str(end - start))
     f.write("\nSample set: " + str(solution))
 
-    # naive postprocessing
-    centroids_naive, assignments_naive, num_viol_naive = \
-        equalsize.postprocess_naive(X, solution)
-    f.write("\nNaive assignments: " + str(assignments_naive))
-    f.write("\nNaive objective value: " + str(equalsize.objective_value(X, assignments_naive, k)))
+    # updated postprocessing
+    centroids_soph, assignments_soph, num_viol_soph = \
+        equalsize.postprocess_soph(X, solution)
+    f.write("\nSophisticated assignments: " + str(assignments_soph))
+    f.write("\n\n")
+    f.close()
+
+def test2(X, target, N, k, filename = "revision_data.txt", alpha = None, beta = None, divisor = None):
+    # data file
+    f = open(filename, "a")
+    f.write(str(datetime.now()))    # denote date and time that test begins
+
+    f.write("\nTarget: " + str(target))
+    f.write("\n(N, k): " + "(" + str(N) + ", " + str(k) + ")")
+    f.write("\nAlpha: " + str(alpha))
+    f.write("\nBeta: " + str(beta))
+    f.write("\nDivisor: " + str(divisor))
+    f.write("\nData: \n" + str(X))
+
+    # solve classically
+    balanced_solution = balanced.balanced_kmeans(X, k)[1]
+    f.write("\nBalanced solution: " + str(balanced_solution))
+
+    kmeans = KMeans(n_clusters=k).fit(X)
+    sklearn_solution = kmeans.labels_
+    f.write("\nSKlearn algorithm solution: " + str(sklearn_solution))
+
+    # generate QUBO model
+    model = equalsize.genModel(X, k, alpha = alpha, beta = beta, divisor = divisor)
+
+    # find sampler
+    sampler = equalsize.set_sampler()  # sets the D-Wave sampler
+
+    # embed on the sampler
+    start = time.time()
+    embedding = equalsize.get_embedding(sampler, model)   # finds an embedding on the smapler
+    end = time.time()
+    f.write("\nTime to find embedding: " + str(end - start))
+
+    start = time.time()
+    embedded_model = equalsize.embed(sampler, model, embedding)   # embed on the D-Wave hardware
+    end = time.time()
+    f.write("\nTime to embed: " + str(end - start))
+    f.write("\nNumber of qubits used: " + str(len(embedded_model.variables)))
+
+    # get quantum solution
+    start = time.time()
+    embedded_solution_set = equalsize.run_quantum(sampler, embedded_model)    # run on the D-Wave hardware
+    end = time.time()
+    f.write("\nAnnealing time: " + str(end - start))
+    start = time.time()
+    solution = equalsize.dwave_postprocess(embedded_solution_set, embedding, model)
+    end = time.time()
+    f.write("\nD-Wave postprocessing time: " + str(end - start))
+    f.write("\nSample set: " + str(solution))
 
     # updated postprocessing
     centroids_soph, assignments_soph, num_viol_soph = \
         equalsize.postprocess_soph(X, solution)
     f.write("\nSophisticated assignments: " + str(assignments_soph))
-    f.write("\nSophisticated objective value: " + str(equalsize.objective_value(X, assignments_soph, k)))
-    f.write("\nNumber of violations: " + str(num_viol_soph))
     f.write("\n\n")
     f.close()
 
-if __name__ == "__main__":
+def oldtest():
     divisor = 0.9
     d = 2
     left_alphas = [1.0 / 2**7, 1.0 / 2**6]
@@ -242,4 +288,58 @@ if __name__ == "__main__":
     #            k = config[1]
     #            test(N, k, d = d, filename = "revision_data_5.txt", \
     #                alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "iris")
+
+'''
+    alphaupper4 = 1.0
+    alphaupper3 = 0.5
+    alphaupper2 = 0.25
+
+    betaupper4 = 1.0
+    betaupper3 = 0.5
+    betaupper2 = 0.25
+
+    problems4 = [(8, 4), (12, 4), (16, 4)]
+    problems3 = [(15, 3), (18, 3), (21, 3)]
+    problems2 = [(16, 2), (24, 2), (32, 2)]
+'''
+def alphabeta(problems, max_alpha, max_beta, low = 0.005, num_trials = 3, resolution = 8, divisor = 0.9, d = 2, f1 = "problemspecs.txt", f2 = "revision_data6.txt"):
+
+    alpha_range = np.linspace(low, max_alpha, resolution)
+    beta_range = np.linspace(low, max_beta, resolution)
+
+    data = {}
+    specfile = open(f1, "a")
+    first = True
+    for problem in problems:
+        if first:
+            first = False
+        else:
+            specfile.write("\n\n")
+        N = problem[0]
+        specfile.write("N: " + str(N) + "\n")
+        k = problem[1]
+        specfile.write("k: " + str(k))
+        data[problem] = []
+        for i in range(num_trials):
+            specfile.write("\n\n")
+            X, target = gen_data(N, k, d)
+            specfile.write("X: \n" + str(X) + "\n")
+            specfile.write("Target: " + str(target))
+            data[problem].append((X, target))
+
+    for key in data.keys():
+        N = key[0]
+        k = key[1]
+        for pair in data[key]:
+            X = pair[0]
+            target = pair[1]
+            for alpha in alpha_range:
+                for beta in beta_range:
+                    test2(X, target, N, k, filename = f2, alpha = alpha * N / k, beta = beta * N / k, divisor = divisor)
+
+if __name__ == "__main__":
+    problems = [(16, 2), (24, 2), (32, 2)]
+    max_alpha = 1.0
+    max_beta = 0.25
+    alphabeta(problems, max_alpha, max_beta)
 
