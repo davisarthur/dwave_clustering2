@@ -339,8 +339,8 @@ def alphabeta(problems, max_alpha, max_beta, low = 0.005, num_trials = 3, resolu
                     test2(X, target, N, k, filename = f2, alpha = alpha * N / k, beta = beta * N / k, divisor = divisor)
 
 if __name__ == "__main__":
-    problems = [(15, 3)]
-    max_alpha = 0.5
-    max_beta = 0.5
+    problems = [(12, 4), (16, 4)]
+    max_alpha = 1.0
+    max_beta = 1.0
     alphabeta(problems, max_alpha, max_beta)
 
