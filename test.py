@@ -308,25 +308,43 @@ def alphabeta(problems, max_alpha, max_beta, low = 0.005, num_trials = 3, resolu
     beta_range = np.linspace(low, max_beta, resolution)
 
     data = {}
-    specfile = open(f1, "a")
-    first = True
-    for problem in problems:
-        if first:
-            first = False
-        else:
-            specfile.write("\n\n")
-        N = problem[0]
-        specfile.write("N: " + str(N) + "\n")
-        k = problem[1]
-        specfile.write("k: " + str(k))
-        data[problem] = []
-        for i in range(num_trials):
-            specfile.write("\n\n")
-            X, target = gen_data(N, k, d)
-            specfile.write("X: \n" + str(X) + "\n")
-            specfile.write("Target: " + str(target))
-            data[problem].append((X, target))
-    specfile.close()
+    #specfile = open(f1, "a")
+    #first = True
+    #for problem in problems:
+    #    if first:
+    #        first = False
+    #    else:
+    #        specfile.write("\n\n")
+    #    N = problem[0]
+    #    specfile.write("N: " + str(N) + "\n")
+    #    k = problem[1]
+    #    specfile.write("k: " + str(k))
+    #    data[problem] = []
+    #    for i in range(num_trials):
+    #        specfile.write("\n\n")
+    #        X, target = gen_data(N, k, d)
+    #        specfile.write("X: \n" + str(X) + "\n")
+    #        specfile.write("Target: " + str(target))
+    #        data[problem].append((X, target))
+    #specfile.close()
+    data[(16, 4)] = [([[-1.4316349, -1.04395168],\
+        [-0.5472602 , -1.75605954],\
+        [-0.6202147 , -0.494248  ],\
+        [ 1.37479697,  1.33664003],\
+        [ 0.16140852,  0.56074019],\
+        [ 0.77386581,  1.18145164],\
+        [-2.13285722,  0.93999495],\
+        [ 2.03660849, -1.47046369],\
+        [ 2.03354585, -0.35970688],\
+        [-1.21239623,  0.62446884],\
+        [-1.89235198, -1.31288686],\
+        [-0.88432373,  1.90725876],\
+        [ 1.34038715,  0.89657584],\
+        [-1.26179329, -0.89339715],\
+        [-2.08898057,  2.57266449],\
+        [ 1.43514181, -1.87092473]],\
+        [0, 1, 0, 3, 3, 3, 2, 1, 1, 2, 0, 2, 3, 0, 2, 1])]
+
 
     for key in data.keys():
         N = key[0]
@@ -334,7 +352,7 @@ def alphabeta(problems, max_alpha, max_beta, low = 0.005, num_trials = 3, resolu
         for pair in data[key]:
             X = pair[0]
             target = pair[1]
-            for alpha in alpha_range:
+            for alpha in alpha_range[-2:]:
                 for beta in beta_range:
                     test2(X, target, N, k, filename = f2, alpha = alpha * N / k, beta = beta * N / k, divisor = divisor)
 
@@ -343,4 +361,3 @@ if __name__ == "__main__":
     max_alpha = 1.0
     max_beta = 1.0
     alphabeta(problems, max_alpha, max_beta)
-
