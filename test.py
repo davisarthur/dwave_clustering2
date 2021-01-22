@@ -211,27 +211,11 @@ def oldtest():
     d = 2
     left_alphas = [1.0 / 2**7, 1.0 / 2**6]
     bottom_betas = [1.0 / 2**7, 1.0 / 2**6]
-    #old_alphas = [0.03125, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
     old_alphas = [4.0, 8.0]
     old_betas = [0.03125, 0.0625, 0.125, 0.25, 0.5, 1.0]
 
     num_trials = 3
     synth_configs = [(16, 2), (24, 2), (32, 2), (12, 3), (15, 3), (18, 3), (21, 3), (8, 4), (12, 4), (16, 4)]
-    #for alpha in left_alphas:
-    #    for beta in old_betas:
-    #        for config in synth_configs:
-    #            for _ in range(num_trials):
-    #                N = config[0]
-    #                k = config[1]
-    #                test(N, k, d = d, filename = "revision_data_5.txt", alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
-
-    #for alpha in left_alphas:
-    #    for beta in bottom_betas:
-    #        for config in synth_configs:
-    #            for _ in range(num_trials):
-    #                N = config[0]
-    #                k = config[1]
-    #                test(N, k, d = d, filename = "revision_data_5.txt", alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
 
     for alpha in old_alphas:
         for beta in bottom_betas:
@@ -240,54 +224,6 @@ def oldtest():
                     N = config[0]
                     k = config[1]
                     test(N, k, d = d, filename = "revision_data_5.txt", alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
-
-    #betas = [4.0, 8.0]
-    #synth_configs = [(8, 2), (16, 2), (24, 2), (32, 2), (12, 3), (15, 3), (18, 3), (21, 3), (8, 4), (12, 4), (16, 4)]
-    #iris_configs = [(8, 2), (16, 2), (24, 2), (32, 2), (9, 3), (12, 3), (15, 3), (18, 3), (21, 3)]
-    
-    #spare_synth_configs = [(32, 2), (12, 3), (15, 3), (18, 3), (21, 3), (8, 4), (12, 4), (16, 4)]
-    #for config in spare_synth_configs:
-    #    alpha = 1.0
-    #    beta = 2.0
-    #    N = config[0]
-    #    k = config[1]
-    #    test(N, k, d = d, filename = "revision_data_5.txt", \
-    #        alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
-
-    #for config in iris_configs:
-    #    alpha = 1.0
-    #    beta = 2.0
-    #    N = config[0]
-    #    k = config[1]
-    #    test(N, k, d = d, filename = "revision_data_5.txt", \
-    #        alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "iris")
-
-    #spare_alphas = [2.0, 4.0, 8.0]
-    #for alpha in spare_alphas:
-    #    beta = 2.0
-    #    for config in synth_configs:
-    #        N = config[0]
-    #        k = config[1]
-    #        test(N, k, d = d, filename = "revision_data_5.txt", \
-    #            alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
-    #    for config in iris_configs:
-    #        N = config[0]
-    #        k = config[1]
-    #        test(N, k, d = d, filename = "revision_data_5.txt", \
-    #            alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "iris")
-
-    #for beta in betas:
-    #    for alpha in alphas:
-    #        for config in synth_configs:
-    #            N = config[0]
-    #            k = config[1]
-    #            test(N, k, d = d, filename = "revision_data_5.txt", \
-    #                alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
-    #        for config in iris_configs:
-    #            N = config[0]
-    #            k = config[1]
-    #            test(N, k, d = d, filename = "revision_data_5.txt", \
-    #                alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "iris")
 
 '''
     alphaupper4 = 1.0
@@ -356,8 +292,28 @@ def alphabeta(problems, max_alpha, max_beta, low = 0.005, num_trials = 3, resolu
                 for beta in beta_range:
                     test2(X, target, N, k, filename = f2, alpha = alpha * N / k, beta = beta * N / k, divisor = divisor)
 
+
+'''
+    problem list
+    synth: 
+        (8, 2, 0.1, 1.4), (16, 2, 0.1, 1.4), (24, 2, 0.1, 1.4), (32, 2, 0.1, 1.2)
+        (12, 3, 0.2, 1.2), (15, 3, 0.2, 1.2), (18, 3, 0.2, 0.6), (21, 3, 0.1, 1.0)
+        (8, 4, 1.6, 0.2), (12, 4, 1.6, 0.1), (16, 4, 0.6, 0.1)
+    iris:
+        (8, 2, 0.1, 1.4), (16, 2, 0.1, 1.4), (24, 2, 0.1, 1.4), (32, 2, 0.1, 1.2)
+        (9, 3, 0.2, 1.2), (12, 3, 0.2, 1.2), (15, 3, 0.2, 1.2), (18, 3, 0.2, 0.6), (21, 3, 0.1, 1.0)
+'''
+def final(problem, alpha, beta, gentype, num_trials = 80, divisor = 0.9, d = 2, f = "data/final_revisions.txt"):
+    for _ in range(num_trials):
+        N = problem[0]
+        k = problem[1]
+        test(N, k, d = d, filename = f, alpha = alpha, beta = beta, divisor = divisor, data = gentype)  
+
 if __name__ == "__main__":
-    problems = [(12, 4), (16, 4)]
-    max_alpha = 1.0
-    max_beta = 1.0
-    alphabeta(problems, max_alpha, max_beta)
+    specs = (8, 2, 0.1, 1.4, "iris")
+    N = specs[0]
+    k = specs[1]
+    alpha = specs[2]
+    beta = specs[3]
+    gentype = specs[4]
+    final((N, k), alpha, beta, gentype)

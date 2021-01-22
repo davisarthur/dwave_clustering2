@@ -1,48 +1,37 @@
 import numpy as np
 import random
-
-def psuedosolution(N, k, target, viol_size, viol_rate):
-    psuedo = np.zeros(N * k).as_type(int)
-    for i in range(N):
-        assigned = True if random.random() > viol_rate else False
-        if assigned:
-            psuedo[i + N * target[i]] = 1
-            continue
-
-        rand = int(np.round(np.random.normal(loc = 1, scale = viol_size)))
-        if rand >= k:
-            for j in range(k):
-                psuedo[i + N * j] = 1
-        if rand > 0:
-            psuedo[i + N * target[i]] = 1
-            for n in range(rand - 1):
-                while True:
-                    index = i + N * ((target[i] + random.randint(1, k - 1)) % k)
-                    if psuedo[i + N * index] == 0:
-                        psuedo[i + N * index] == 1
-                        break
-    return psuedo
+import equalsize
 
 '''
     distribution is an array of length k where each element is equal to the probability of a
     point being assigned to that many clusters or less
 '''
-def psuedosolution2(N, k, target, distribution):
-    psuedo = np.zeros(N * k).as_type(int)
+def psuedosolution(N, k, target, distribution):
+    psuedo = np.zeros(N * k).astype(int)
     for i in range(N):
         result = random.random()
         num_assigned = -1
-        for i in range(len(distribution))):
-            if result < distribution[i]:
-                num_assigned = i
+        for j in range(len(distribution)):
+            if result <= distribution[j]:
+                num_assigned = j
                 break
-        possible_assignments = list(range(1, k + 1))
+        possible_assignments = list(range(k))
+        ideal_assignment = possible_assignments.index(target[i])
+        possible_assignments.remove(ideal_assignment)
         
+        if num_assigned == 0:
+            continue
+        if num_assigned >= 1:
+            psuedo[i + N * ideal_assignment] = 1
+            for _ in range(num_assigned - 1):
+                new_assignment = random.choice(possible_assignments)
+                possible_assignments.remove(new_assignment)
+                psuedo[i + N * ideal_assignment] = 1
     return psuedo
 
-N = 9
-k = 3
-X = [[-0.82758983, 0.43967755],\
+N = 32
+k = 2
+X = np.array([[-0.82758983, 0.43967755],\
     [-1.68537408,  1.78473034],\
     [-2.05593747,  2.08133468],\
     [-0.47036195,  1.20097233],\
@@ -73,11 +62,16 @@ X = [[-0.82758983, 0.43967755],\
     [ 0.60653457, -1.08551495],\
     [-0.37898001,  0.12791667],\
     [ 2.6220156 , -2.14575526],\
-    [ 2.15174964, -3.24099123]]
+    [ 2.15174964, -3.24099123]])
 target = [1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0]
-viol_size = 1.0
-psuedosolution()
-
+ogdistribution = [0.4, 0.5, 0.1]
+distribution = [0.0] * len(ogdistribution)
+for i in range(len(ogdistribution)):
+    distribution[i] = sum(ogdistribution[0:i + 1])
+psuedo = psuedosolution(N, k, target, distribution)
+postpsuedo = equalsize.postprocess_soph(X, psuedo)
+print(psuedo)
+print(postpsuedo[1])
 
                 
 
