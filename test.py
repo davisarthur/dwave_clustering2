@@ -310,7 +310,7 @@ def final(problem, alpha, beta, gentype, num_trials = 80, divisor = 0.9, d = 2, 
         test(N, k, d = d, filename = f, alpha = alpha, beta = beta, divisor = divisor, data = gentype)  
 
 if __name__ == "__main__":
-    specs = (8, 2, 0.1, 1.4, "iris")
+    specs = (21, 3, 0.1, 1.0, "iris")
     N = specs[0]
     k = specs[1]
     alpha = specs[2]
