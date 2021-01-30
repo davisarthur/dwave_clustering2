@@ -5,6 +5,7 @@ import equalsize
 import balanced
 import random
 import scipy.spatial.distance
+import reader
 from sklearn.cluster import KMeans
 from datetime import datetime
 from dwave.system import DWaveSampler, EmbeddingComposite
@@ -86,24 +87,15 @@ def gen_iris(N, k):
                 count += 1
     return X, target
 
-def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, beta = None, divisor = None, data = "synth"):
+def test(X, target, N, k, filename, alpha = None, beta = None):
     # data file
     f = open(filename, "a")
     f.write(str(datetime.now()))    # denote date and time that test begins
 
-    X = None
-    target = None
-    if data == "synth":
-        X, target = gen_data(N, k, d)
-        f.write("\nSynthetic data")
-    if data == "iris":
-        X, target = gen_iris(N, k)
-        f.write("\nIris data")
     f.write("\nTarget: " + str(target))
     f.write("\n(N, k): " + "(" + str(N) + ", " + str(k) + ")")
     f.write("\nAlpha: " + str(alpha))
     f.write("\nBeta: " + str(beta))
-    f.write("\nDivisor: " + str(divisor))
     f.write("\nData: \n" + str(X))
 
     # solve classically
@@ -115,7 +107,7 @@ def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, beta = None,
     f.write("\nSKlearn algorithm solution: " + str(sklearn_solution))
 
     # generate QUBO model
-    model = equalsize.genModel(X, k, alpha = alpha, beta = beta, divisor = divisor)
+    model = equalsize.genModel(X, k, alpha = alpha, beta = beta)
 
     # find sampler
     sampler = equalsize.set_sampler()  # sets the D-Wave sampler
@@ -142,88 +134,8 @@ def test(N, k, d = 2, filename = "revision_data.txt", alpha = None, beta = None,
     end = time.time()
     f.write("\nD-Wave postprocessing time: " + str(end - start))
     f.write("\nSample set: " + str(solution))
-
-    # updated postprocessing
-    centroids_soph, assignments_soph, num_viol_soph = \
-        equalsize.postprocess_soph(X, solution)
-    f.write("\nSophisticated assignments: " + str(assignments_soph))
     f.write("\n\n")
     f.close()
-
-def test2(X, target, N, k, filename = "revision_data.txt", alpha = None, beta = None, divisor = None):
-    # data file
-    f = open(filename, "a")
-    f.write(str(datetime.now()))    # denote date and time that test begins
-
-    f.write("\nTarget: " + str(target))
-    f.write("\n(N, k): " + "(" + str(N) + ", " + str(k) + ")")
-    f.write("\nAlpha: " + str(alpha))
-    f.write("\nBeta: " + str(beta))
-    f.write("\nDivisor: " + str(divisor))
-    f.write("\nData: \n" + str(X))
-
-    # solve classically
-    balanced_solution = balanced.balanced_kmeans(X, k)[1]
-    f.write("\nBalanced solution: " + str(balanced_solution))
-
-    kmeans = KMeans(n_clusters=k).fit(X)
-    sklearn_solution = kmeans.labels_
-    f.write("\nSKlearn algorithm solution: " + str(sklearn_solution))
-
-    # generate QUBO model
-    model = equalsize.genModel(X, k, alpha = alpha, beta = beta, divisor = divisor)
-
-    # find sampler
-    sampler = equalsize.set_sampler()  # sets the D-Wave sampler
-
-    # embed on the sampler
-    start = time.time()
-    embedding = equalsize.get_embedding(sampler, model)   # finds an embedding on the smapler
-    end = time.time()
-    f.write("\nTime to find embedding: " + str(end - start))
-
-    start = time.time()
-    embedded_model = equalsize.embed(sampler, model, embedding)   # embed on the D-Wave hardware
-    end = time.time()
-    f.write("\nTime to embed: " + str(end - start))
-    f.write("\nNumber of qubits used: " + str(len(embedded_model.variables)))
-
-    # get quantum solution
-    start = time.time()
-    embedded_solution_set = equalsize.run_quantum(sampler, embedded_model)    # run on the D-Wave hardware
-    end = time.time()
-    f.write("\nAnnealing time: " + str(end - start))
-    start = time.time()
-    solution = equalsize.dwave_postprocess(embedded_solution_set, embedding, model)
-    end = time.time()
-    f.write("\nD-Wave postprocessing time: " + str(end - start))
-    f.write("\nSample set: " + str(solution))
-
-    # updated postprocessing
-    centroids_soph, assignments_soph, num_viol_soph = \
-        equalsize.postprocess_soph(X, solution)
-    f.write("\nSophisticated assignments: " + str(assignments_soph))
-    f.write("\n\n")
-    f.close()
-
-def oldtest():
-    divisor = 0.9
-    d = 2
-    left_alphas = [1.0 / 2**7, 1.0 / 2**6]
-    bottom_betas = [1.0 / 2**7, 1.0 / 2**6]
-    old_alphas = [4.0, 8.0]
-    old_betas = [0.03125, 0.0625, 0.125, 0.25, 0.5, 1.0]
-
-    num_trials = 3
-    synth_configs = [(16, 2), (24, 2), (32, 2), (12, 3), (15, 3), (18, 3), (21, 3), (8, 4), (12, 4), (16, 4)]
-
-    for alpha in old_alphas:
-        for beta in bottom_betas:
-            for config in synth_configs:
-                for _ in range(num_trials):
-                    N = config[0]
-                    k = config[1]
-                    test(N, k, d = d, filename = "revision_data_5.txt", alpha = alpha * N / k, beta = beta * N / k, divisor = divisor, data = "synth")
 
 '''
     alphaupper4 = 1.0
@@ -238,60 +150,14 @@ def oldtest():
     problems3 = [(15, 3), (18, 3), (21, 3)]
     problems2 = [(16, 2), (24, 2), (32, 2)]
 '''
-def alphabeta(problems, max_alpha, max_beta, low = 0.005, num_trials = 3, resolution = 8, divisor = 0.9, d = 2, f1 = "problemspecs.txt", f2 = "revision_data6.txt"):
+def alphabeta(N, k, X, target, max_alpha, max_beta, resolution = 8, fname = "data/revisions_ab.txt"):
 
-    alpha_range = np.linspace(low, max_alpha, resolution)
-    beta_range = np.linspace(low, max_beta, resolution)
+    alpha_range = np.linspace(0.0, max_alpha, resolution)
+    beta_range = np.linspace(0.0, max_beta, resolution)
 
-    data = {}
-    #specfile = open(f1, "a")
-    #first = True
-    #for problem in problems:
-    #    if first:
-    #        first = False
-    #    else:
-    #        specfile.write("\n\n")
-    #    N = problem[0]
-    #    specfile.write("N: " + str(N) + "\n")
-    #    k = problem[1]
-    #    specfile.write("k: " + str(k))
-    #    data[problem] = []
-    #    for i in range(num_trials):
-    #        specfile.write("\n\n")
-    #        X, target = gen_data(N, k, d)
-    #        specfile.write("X: \n" + str(X) + "\n")
-    #        specfile.write("Target: " + str(target))
-    #        data[problem].append((X, target))
-    #specfile.close()
-    data[(16, 4)] = [([[-1.4316349, -1.04395168],\
-        [-0.5472602 , -1.75605954],\
-        [-0.6202147 , -0.494248  ],\
-        [ 1.37479697,  1.33664003],\
-        [ 0.16140852,  0.56074019],\
-        [ 0.77386581,  1.18145164],\
-        [-2.13285722,  0.93999495],\
-        [ 2.03660849, -1.47046369],\
-        [ 2.03354585, -0.35970688],\
-        [-1.21239623,  0.62446884],\
-        [-1.89235198, -1.31288686],\
-        [-0.88432373,  1.90725876],\
-        [ 1.34038715,  0.89657584],\
-        [-1.26179329, -0.89339715],\
-        [-2.08898057,  2.57266449],\
-        [ 1.43514181, -1.87092473]],\
-        [0, 1, 0, 3, 3, 3, 2, 1, 1, 2, 0, 2, 3, 0, 2, 1])]
-
-
-    for key in data.keys():
-        N = key[0]
-        k = key[1]
-        for pair in data[key]:
-            X = pair[0]
-            target = pair[1]
-            for alpha in alpha_range[-2:]:
-                for beta in beta_range:
-                    test2(X, target, N, k, filename = f2, alpha = alpha * N / k, beta = beta * N / k, divisor = divisor)
-
+    for alpha in alpha_range:
+        for beta in beta_range:
+            test(X, target, N, k, fname, alpha = alpha, beta = beta)
 
 '''
     problem list
@@ -303,17 +169,14 @@ def alphabeta(problems, max_alpha, max_beta, low = 0.005, num_trials = 3, resolu
         (8, 2, 0.1, 1.4), (16, 2, 0.1, 1.4), (24, 2, 0.1, 1.4), (32, 2, 0.1, 1.2)
         (9, 3, 0.2, 1.2), (12, 3, 0.2, 1.2), (15, 3, 0.2, 1.2), (18, 3, 0.2, 0.6), (21, 3, 0.1, 1.0)
 '''
-def final(problem, alpha, beta, gentype, num_trials = 80, divisor = 0.9, d = 2, f = "data/final_revisions.txt"):
+def final(problem, alpha, beta, gentype, num_trials = 80, d = 2, f = "data/final_revisions.txt"):
     for _ in range(num_trials):
         N = problem[0]
         k = problem[1]
-        test(N, k, d = d, filename = f, alpha = alpha, beta = beta, divisor = divisor, data = gentype)  
+        test(N, k, d = d, filename = f, alpha = alpha, beta = beta, data = gentype)  
 
 if __name__ == "__main__":
-    specs = (21, 3, 0.1, 1.0, "iris")
-    N = specs[0]
-    k = specs[1]
-    alpha = specs[2]
-    beta = specs[3]
-    gentype = specs[4]
-    final((N, k), alpha, beta, gentype)
+    N, k, X, target = reader.readspecs()
+    max_alpha = 1.0
+    max_beta = 2.0
+    alphabeta(N, k, X, target, max_alpha, max_beta)

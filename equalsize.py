@@ -16,7 +16,7 @@ from dimod.traversal import connected_components
 # 6-17-2020
 ##
 
-def genModel(X, k, alpha = None, beta = None, divisor = None):
+def genModel(X, k, alpha = None, beta = None):
     ''' Generate QUBO model
 
     Args:
@@ -27,7 +27,7 @@ def genModel(X, k, alpha = None, beta = None, divisor = None):
         Binary quadratic model of logical QUBO problem
     '''
     N = np.shape(X)[0]
-    return dimod.as_bqm(genA(X, k, alpha = alpha, beta = beta, divisor = divisor), dimod.BINARY)
+    return dimod.as_bqm(genA(X, k, alpha = alpha, beta = beta), dimod.BINARY)
 
 def set_sampler():
     ''' Returns D-Wave sampler being used for annealing
@@ -221,7 +221,7 @@ def objective_value(data, target, k):
 ## Helper functions ##
 ######################
 
-def genA(X, k, alpha = None, beta = None, divisor = None):
+def genA(X, k, alpha = None, beta = None):
     ''' Generate QUBO matrix
 
     Args:
@@ -232,7 +232,8 @@ def genA(X, k, alpha = None, beta = None, divisor = None):
         A: numpy array
     '''
     N = np.shape(X)[0]      # number of points
-    D = genD(X, divisor = divisor)             # distance matrix
+    D = genD(X)             # distance matrix
+    D /= np.amax(D)
     k = int(k)
     if alpha == None:
         alpha = 1.0 / (2.0 * N / k - 1.0)
@@ -265,7 +266,7 @@ def genG(N, k):
     '''
     return np.ones((k, k)) - 2 * np.identity(k)
 
-def genD(X, divisor = None):
+def genD(X):
     ''' Generate D matrix
 
     Args:
@@ -275,10 +276,6 @@ def genD(X, divisor = None):
         D: numpy array
     '''
     D = scipy.spatial.distance.pdist(X, 'sqeuclidean')
-    if divisor == None:
-        D /= np.amax(D)
-    else:
-        D /= np.quantile(D, divisor)
     return scipy.spatial.distance.squareform(D)
 
 def genQ(N, k):
