@@ -181,6 +181,10 @@ def final(N, k, gentype, alpha, beta, num_trials = 10, fname = "data/revisions.t
         test(X, target, N, k, fname, alpha = alpha, beta = beta)
 
 '''
+All to test: 
+    synth: (8, 2), (16, 2), (24, 2), (32, 2), (12, 3), (15, 3), (18, 3), (21, 3), (8, 4), (12, 4), (16, 4)
+    iris: (8, 2), (16, 2), (24, 2), (32, 2), (9, 3), (12, 3), (15, 3), (18, 3), (21, 3)
+
 16, 2: postprocessing = 2, alpha = 0.15, beta = 1.4
 24, 2: postprocessing = 2, alpha = 0.0, beta = 0.6  OR  alpha = 0.4, beta = 1.15
 32, 2: postprocessing = 1, alpha = 0.15, beta = 1.5 
@@ -193,7 +197,6 @@ def final(N, k, gentype, alpha, beta, num_trials = 10, fname = "data/revisions.t
 '''
 
 if __name__ == "__main__":
-    N, k, X, target = reader.readspecs()
-    max_alpha = 1.0
-    max_beta = 2.0
-    alphabeta(N, k, X, target, max_alpha, max_beta)
+    N = 16
+    k = 2
+    gentype = 
