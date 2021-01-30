@@ -169,7 +169,7 @@ def alphabeta(N, k, X, target, max_alpha, max_beta, resolution = 8, fname = "dat
         (8, 2, 0.1, 1.4), (16, 2, 0.1, 1.4), (24, 2, 0.1, 1.4), (32, 2, 0.1, 1.2)
         (9, 3, 0.2, 1.2), (12, 3, 0.2, 1.2), (15, 3, 0.2, 1.2), (18, 3, 0.2, 0.6), (21, 3, 0.1, 1.0)
 '''
-def final(N, k, gentype, alpha, beta, num_trials = 10, fname = "data/revisions.txt"):
+def final(N, k, gentype, alpha, beta, num_trials = 10, fname = "data/revisions_iris.txt"):
     for _ in range(num_trials):
         X = None
         target = None,
@@ -197,9 +197,9 @@ All to test:
 '''
 
 if __name__ == "__main__":
-    problems = [(8, 2, 0.2, 1.4), (16, 2, 0.15, 1.4), (24, 2, 0.4, 1.15), (32, 2, 0.15, 1.5), (12, 3, 0.4, 1.1), (15, 3, 0.25, 0.8), (18, 3, 0.2, 0.8), (21, 3, 0.15, 0.8), (8, 4, 0.9, 0.0), (12, 4, 0.8, 0.25), (16, 4, 1.0, 0.25)]
+    problems = [(8, 2, 0.2, 1.4), (16, 2, 0.15, 1.4), (24, 2, 0.4, 1.15), (32, 2, 0.15, 1.5), (9, 3, 0.5, 1.2), (12, 3, 0.4, 1.1), (15, 3, 0.25, 0.8), (18, 3, 0.2, 0.8), (21, 3, 0.15, 0.8)]
     for prob in problems:
-        gentype = "synth"
+        gentype = "iris"
         N = prob[0]
         k = prob[1]
         alpha = prob[2]
