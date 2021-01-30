@@ -169,11 +169,28 @@ def alphabeta(N, k, X, target, max_alpha, max_beta, resolution = 8, fname = "dat
         (8, 2, 0.1, 1.4), (16, 2, 0.1, 1.4), (24, 2, 0.1, 1.4), (32, 2, 0.1, 1.2)
         (9, 3, 0.2, 1.2), (12, 3, 0.2, 1.2), (15, 3, 0.2, 1.2), (18, 3, 0.2, 0.6), (21, 3, 0.1, 1.0)
 '''
-def final(problem, alpha, beta, gentype, num_trials = 80, d = 2, f = "data/final_revisions.txt"):
+def final(N, k, gentype, alpha, beta, num_trials = 10, fname = "data/revisions.txt"):
     for _ in range(num_trials):
-        N = problem[0]
-        k = problem[1]
-        test(N, k, d = d, filename = f, alpha = alpha, beta = beta, data = gentype)  
+        X = None
+        target = None,
+        if gentype == "synth":
+            d = 2
+            X, target = gen_data(N, k, d)
+        if gentype == "iris":
+            X, target = gen_iris(N, k)
+        test(X, target, N, k, fname, alpha = alpha, beta = beta)
+
+'''
+16, 2: postprocessing = 2, alpha = 0.15, beta = 1.4
+24, 2: postprocessing = 2, alpha = 0.0, beta = 0.6  OR  alpha = 0.4, beta = 1.15
+32, 2: postprocessing = 1, alpha = 0.15, beta = 1.5 
+12, 3: postprocessing = 2, alpha = 0.4, beta = 1.1  OR  alpha = 0.0, beta = 1.1
+15, 3: postprocessing = 1, alpha = 0.25, beta = 0.8 OR  alpha = 0.15, beta = 0.0
+21, 3: postprocessing = 1, alpha = 0.15, beta = 0.8
+8, 4: postprocessing = 1, alpha = 0.9, beta = 0.0   OR  alpha = 0.5, beta = 0.7
+12, 4: postprocessing = 1, alpha = 0.8, beta = 0.25
+16, 4: postprocessing = 1, alpha = 1.0, beta = 0.25
+'''
 
 if __name__ == "__main__":
     N, k, X, target = reader.readspecs()
